@@ -1,0 +1,27 @@
+pre-commit:
+  parallel: true
+  commands:
+    hadolint:
+      glob: "*Dockerfile*"
+      run: docker run --rm -i -v ${PWD}:/app -w="/app" hadolint/hadolint < {staged_files}
+    markdownlint:
+      glob: "*.md*"
+      exclude: "CHANGELOG.md"
+      run: docker run --rm -v ${PWD}:/app -w="/app" davidanson/markdownlint-cli2:v0.14.0 {staged_files}
+lint:
+  parallel: true
+  commands:
+    hadolint:
+      glob: "*Dockerfile*"
+      run: docker run --rm -i -v ${PWD}:/app -w="/app" hadolint/hadolint < Dockerfile
+    markdownlint:
+      glob: "*.md*"
+      exclude: "CHANGELOG.md"
+      run: docker run --rm -v ${PWD}:/app -w="/app" davidanson/markdownlint-cli2:v0.14.0 {all_files}
+fix:
+  parallel: true
+  commands:
+    markdownlint:
+      glob: "*.md*"
+      exclude: "CHANGELOG.md"
+      run: docker run --rm -v ${PWD}:/app -w="/app" davidanson/markdownlint-cli2:v0.14.0 {all_files} --fix

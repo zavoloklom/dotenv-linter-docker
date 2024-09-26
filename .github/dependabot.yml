@@ -1,0 +1,11 @@
+version: 2
+updates:
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    allow:
+      - dependency-type: "direct"
+        dependency-name: "alpine"
+      - dependency-type: "direct"
+        dependency-name: "busybox"
