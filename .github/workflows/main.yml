@@ -49,6 +49,7 @@ jobs:
             DOTENV_LINTER_VERSION=${{ env.DOTENV_LINTER_VERSION }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             BUILD_REVISION=${{ env.BUILD_REVISION }}
+          target: alpine-version
 
       # Build and push BusyBox version for multiple platforms
       - name: Build and push BusyBox version
@@ -65,3 +66,4 @@ jobs:
             DOTENV_LINTER_VERSION=${{ env.DOTENV_LINTER_VERSION }}
             BUILD_DATE=${{ env.BUILD_DATE }}
             BUILD_REVISION=${{ env.BUILD_REVISION }}
+          target: busybox-version
