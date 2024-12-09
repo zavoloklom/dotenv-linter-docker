@@ -1,4 +1,4 @@
-FROM alpine:3.20.3 AS alpine-version
+FROM alpine:3.21.0 AS alpine-version
 
 ARG DOTENV_LINTER_VERSION="0.0.0"
 
