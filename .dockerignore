@@ -24,9 +24,6 @@
 # Github
 .github/
 
-# Dockerfile
-Dockerfile
-
 # Linters and Makefile
 Makefile
 lefthook.yml
