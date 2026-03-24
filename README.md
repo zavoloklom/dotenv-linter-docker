@@ -42,7 +42,7 @@ pull the images and run `dotenv-linter` commands inside the container.
 1. **Pull the image**:
 
    ```shell
-   docker pull zavoloklom/dotenv-linter:3.3.0-alpine
+   docker pull zavoloklom/dotenv-linter:latest-alpine
    ```
 
 2. **Run the linter**:
@@ -50,7 +50,7 @@ pull the images and run `dotenv-linter` commands inside the container.
    To run the `dotenv-linter` using the Alpine-based image, use the following command:
 
    ```shell
-   docker run --rm -v ${PWD}:/app zavoloklom/dotenv-linter:3.3.0-alpine <COMMAND> <ARGS>
+   docker run --rm -v ${PWD}:/app zavoloklom/dotenv-linter:latest-alpine <COMMAND> <ARGS>
    ```
 
    Replace `<COMMAND>` and `<ARGS>` with the appropriate `dotenv-linter` command and arguments.
@@ -58,7 +58,7 @@ pull the images and run `dotenv-linter` commands inside the container.
    For example, to check the `.env` file in your current directory:
 
    ```shell
-   docker run --rm -v ${PWD}:/app zavoloklom/dotenv-linter:3.3.0-alpine check .env
+   docker run --rm -v ${PWD}:/app zavoloklom/dotenv-linter:latest-alpine check .env
    ```
 
    This command mounts the current directory (`${PWD}`) into `/app` inside the container and runs `dotenv-linter` on
@@ -69,7 +69,7 @@ pull the images and run `dotenv-linter` commands inside the container.
 1. **Pull the image**:
 
    ```shell
-   docker pull zavoloklom/dotenv-linter:3.3.0-busybox
+   docker pull zavoloklom/dotenv-linter:latest-busybox
    ```
 
 2. **Run the linter**:
@@ -77,7 +77,7 @@ pull the images and run `dotenv-linter` commands inside the container.
    For a smaller footprint, use the BusyBox version. The command structure is the same:
 
    ```shell
-   docker run --rm -v ${PWD}:/app zavoloklom/dotenv-linter:3.3.0-busybox check .env
+   docker run --rm -v ${PWD}:/app zavoloklom/dotenv-linter:latest-busybox check .env
    ```
 
 ## Documentation
