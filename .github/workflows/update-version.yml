@@ -22,6 +22,9 @@ jobs:
         id: get_release
         run: |
           LATEST_VERSION=$(curl -s https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/latest | jq -r .tag_name | sed 's/^v//')
+          if [ -z "$LATEST_VERSION" ] || [ "$LATEST_VERSION" = "null" ]; then
+            echo "ERROR: Could not determine latest version" && exit 1
+          fi
           echo "LATEST_VERSION=${LATEST_VERSION}" >> $GITHUB_ENV
 
       # Get current VERSION
