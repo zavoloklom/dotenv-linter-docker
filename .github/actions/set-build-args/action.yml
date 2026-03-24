@@ -1,0 +1,15 @@
+name: Set build arguments
+description: Compute and export DOTENV_LINTER_VERSION, BUILD_DATE, and BUILD_REVISION as environment variables
+
+runs:
+  using: composite
+  steps:
+    - name: Set build arguments
+      shell: bash
+      run: |
+        DOTENV_LINTER_VERSION=$(cat VERSION)
+        BUILD_DATE=$(date +%Y-%m-%dT%T%z)
+        BUILD_REVISION=$(git rev-parse --short HEAD)
+        echo "DOTENV_LINTER_VERSION=$DOTENV_LINTER_VERSION" >> $GITHUB_ENV
+        echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
+        echo "BUILD_REVISION=$BUILD_REVISION" >> $GITHUB_ENV
