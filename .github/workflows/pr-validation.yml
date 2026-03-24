@@ -18,13 +18,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set build arguments
-        run: |
-          DOTENV_LINTER_VERSION=$(cat VERSION)
-          BUILD_DATE=$(date +%Y-%m-%dT%T%z)
-          BUILD_REVISION=$(git rev-parse --short HEAD)
-          echo "DOTENV_LINTER_VERSION=$DOTENV_LINTER_VERSION" >> $GITHUB_ENV
-          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
-          echo "BUILD_REVISION=$BUILD_REVISION" >> $GITHUB_ENV
+        uses: ./.github/actions/set-build-args
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
