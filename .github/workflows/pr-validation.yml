@@ -38,7 +38,7 @@ jobs:
         with:
           install: true
 
-      - name: Build Alpine version
+      - name: Build Alpine version (multi-platform)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -50,7 +50,7 @@ jobs:
             BUILD_REVISION=${{ env.BUILD_REVISION }}
           target: alpine-version
 
-      - name: Build BusyBox version
+      - name: Build BusyBox version (multi-platform)
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -61,3 +61,37 @@ jobs:
             BUILD_DATE=${{ env.BUILD_DATE }}
             BUILD_REVISION=${{ env.BUILD_REVISION }}
           target: busybox-version
+
+      - name: Load Alpine image for smoke test
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          platforms: linux/amd64
+          tags: dotenv-linter:smoke-alpine
+          build-args: |
+            DOTENV_LINTER_VERSION=${{ env.DOTENV_LINTER_VERSION }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            BUILD_REVISION=${{ env.BUILD_REVISION }}
+          target: alpine-version
+
+      - name: Smoke test Alpine image
+        run: docker run --rm dotenv-linter:smoke-alpine --version
+
+      - name: Load BusyBox image for smoke test
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          platforms: linux/amd64
+          tags: dotenv-linter:smoke-busybox
+          build-args: |
+            DOTENV_LINTER_VERSION=${{ env.DOTENV_LINTER_VERSION }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            BUILD_REVISION=${{ env.BUILD_REVISION }}
+          target: busybox-version
+
+      - name: Smoke test BusyBox image
+        run: docker run --rm dotenv-linter:smoke-busybox --version
