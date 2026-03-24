@@ -1,0 +1,56 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: pr-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set build arguments
+        run: |
+          DOTENV_LINTER_VERSION=$(cat VERSION)
+          BUILD_DATE=$(date +%Y-%m-%dT%T%z)
+          BUILD_REVISION=$(git rev-parse --short HEAD)
+          echo "DOTENV_LINTER_VERSION=$DOTENV_LINTER_VERSION" >> $GITHUB_ENV
+          echo "BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
+          echo "BUILD_REVISION=$BUILD_REVISION" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          install: true
+
+      - name: Build Alpine version
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            DOTENV_LINTER_VERSION=${{ env.DOTENV_LINTER_VERSION }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            BUILD_REVISION=${{ env.BUILD_REVISION }}
+          target: alpine-version
+
+      - name: Build BusyBox version
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            DOTENV_LINTER_VERSION=${{ env.DOTENV_LINTER_VERSION }}
+            BUILD_DATE=${{ env.BUILD_DATE }}
+            BUILD_REVISION=${{ env.BUILD_REVISION }}
+          target: busybox-version
