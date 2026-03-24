@@ -11,7 +11,7 @@ RUN apk update && apk upgrade && \
 
 # Install dotenv-linter
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
-RUN curl -sSfL https://git.io/JLbXn | ash -s -- -b /usr/local/bin v${DOTENV_LINTER_VERSION}
+RUN curl -sSfL https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | ash -s -- -b /usr/local/bin v${DOTENV_LINTER_VERSION}
 
 WORKDIR /app
 
