@@ -1,11 +1,17 @@
 version: 2
 updates:
-  - package-ecosystem: "docker"
-    directory: "/"
+  - package-ecosystem: docker
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
     allow:
-      - dependency-type: "direct"
-        dependency-name: "alpine"
-      - dependency-type: "direct"
-        dependency-name: "busybox"
+      - dependency-type: direct
+        dependency-name: alpine
+      - dependency-type: direct
+        dependency-name: busybox
+  - package-ecosystem: github-actions
+    directory: /
+    commit-message:
+      prefix: ci(deps)
+    schedule:
+      interval: weekly
