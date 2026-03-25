@@ -11,6 +11,7 @@ Before making contributions, ensure the following:
 
 - Your local development environment matches the project's requirements for versions of Docker and any other necessary
   tools.
+- Install **Task** by following the installation instructions from [Task](https://taskfile.dev/installation/).
 - You have thoroughly read the project documentation to best understand its features and functionalities.
 - Install **Lefthook** by following the installation instructions
   from [Lefthook GitHub](https://github.com/evilmartians/lefthook).
@@ -18,7 +19,7 @@ Before making contributions, ensure the following:
   Once **Lefthook** is installed, initialize it by running:
 
    ```shell
-   make init
+   task init
    ```
 
   **Lefthook** will set up git hooks to ensure code consistency and automatically run checks before you commit changes.
@@ -29,10 +30,11 @@ Before making contributions, ensure the following:
 2. Build the Docker images locally:
 
    ```shell
-   # Build Alpine version
-   make alpine 
-   # Build BusyBox version
-   make busybox 
+   # Build both versions
+   task build
+   # Or individually
+   task build:alpine
+   task build:busybox
    ```
 
 3. Test the images by running `dotenv-linter` commands inside the container. To work inside the container, you can use
@@ -40,9 +42,9 @@ Before making contributions, ensure the following:
 
    ```shell
    # For Alpine version
-   make dev-alpine 
+   task dev:alpine
    # For BusyBox version
-   make dev-busybox 
+   task dev:busybox
    ```
 
 ## Pull Requests
@@ -61,13 +63,13 @@ Before making contributions, ensure the following:
   use the command:
 
    ```shell
-   make lint
+   task lint
    ```
 
 - If you need to apply automatic fixes, run:
 
    ```shell
-   make fix
+   task fix
    ```
 
 ## Reporting Issues

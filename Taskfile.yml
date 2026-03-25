@@ -1,0 +1,115 @@
+version: '3'
+
+vars:
+  IMAGE_NAME: zavoloklom/dotenv-linter
+  IMAGE_TAG: dev
+  BUILD_DATE:
+    sh: date +%Y-%m-%dT%T%z
+  BUILD_REVISION:
+    sh: git rev-parse --short HEAD
+  DOTENV_LINTER_VERSION:
+    sh: cat VERSION
+  HADOLINT_IMAGE: hadolint/hadolint:v2.14.0
+  HADOLINT_FILES: 'Dockerfile'
+  MARKDOWNLINT_IMAGE: davidanson/markdownlint-cli2:v0.14.0
+  MARKDOWNLINT_FILES: '"**/*.md" "!CHANGELOG.md"'
+
+tasks:
+  default:
+    silent: true
+    cmds:
+      - task --list
+
+  init:
+    desc: Set up git hooks with lefthook.
+    cmds:
+      - lefthook install
+
+  lint:hadolint:
+    desc: Lint Dockerfiles with hadolint. Pass specific files via `-- <files>`, otherwise lints all.
+    vars:
+      FILES: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.HADOLINT_FILES}}{{end}}'
+    cmds:
+      - |
+        for f in {{.FILES}}; do
+          docker run --rm -i -v $PWD:/app -w /app {{.HADOLINT_IMAGE}} < $f
+        done
+
+  lint:markdownlint:
+    desc: Lint markdown files with markdownlint. Pass specific files via `-- <files>`, otherwise lints all.
+    vars:
+      FILES: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.MARKDOWNLINT_FILES}}{{end}}'
+    cmds:
+      - docker run --rm -v $PWD:/app -w /app {{.MARKDOWNLINT_IMAGE}} {{.FILES}}
+
+  lint:
+    desc: Run all linters.
+    deps: [lint:hadolint, lint:markdownlint]
+
+  fix:markdownlint:
+    desc: Auto-fix markdown files with markdownlint. Pass specific files via `-- <files>`, otherwise fixes all.
+    vars:
+      FILES: '{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}{{.MARKDOWNLINT_FILES}}{{end}}'
+    cmds:
+      - docker run --rm -v $PWD:/app -w /app {{.MARKDOWNLINT_IMAGE}} --fix {{.FILES}}
+
+  fix:
+    desc: Run all auto-fixes.
+    deps: [fix:markdownlint]
+
+  _build:
+    internal: true
+    cmds:
+      - >
+        docker build --file Dockerfile . --tag {{.IMAGE_NAME}}:{{.VARIANT}}-{{.IMAGE_TAG}}
+        --target={{.VARIANT}}-version
+        --pull
+        --build-arg DOTENV_LINTER_VERSION={{.DOTENV_LINTER_VERSION}}
+        --build-arg BUILD_DATE={{.BUILD_DATE}}
+        --build-arg BUILD_REVISION={{.BUILD_REVISION}}
+
+  build:alpine:
+    desc: Build alpine-version docker image.
+    cmds:
+      - task: _build
+        vars: { VARIANT: alpine }
+
+  build:busybox:
+    desc: Build busybox-version docker image.
+    cmds:
+      - task: _build
+        vars: { VARIANT: busybox }
+
+  build:
+    desc: Build both docker images.
+    deps: [build:alpine, build:busybox]
+
+  test:alpine:
+    desc: Build and smoke test the alpine-version image.
+    deps: [build:alpine]
+    cmds:
+      - docker run --rm {{.IMAGE_NAME}}:alpine-{{.IMAGE_TAG}} --version
+
+  test:busybox:
+    desc: Build and smoke test the busybox-version image.
+    deps: [build:busybox]
+    cmds:
+      - docker run --rm {{.IMAGE_NAME}}:busybox-{{.IMAGE_TAG}} --version
+
+  test:
+    desc: Build and smoke test both images.
+    deps: [test:alpine, test:busybox]
+
+  dev:alpine:
+    desc: Start alpine container. All files are synced.
+    interactive: true
+    deps: [build:alpine]
+    cmds:
+      - docker run --rm -it --entrypoint="/bin/sh" -v $PWD:/app {{.IMAGE_NAME}}:alpine-{{.IMAGE_TAG}}
+
+  dev:busybox:
+    desc: Start busybox container. All files are synced.
+    interactive: true
+    deps: [build:busybox]
+    cmds:
+      - docker run --rm -it --entrypoint="/bin/sh" -v $PWD:/app {{.IMAGE_NAME}}:busybox-{{.IMAGE_TAG}}
