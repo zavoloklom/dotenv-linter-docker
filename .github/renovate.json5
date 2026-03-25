@@ -1,0 +1,70 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "enabledManagers": ["dockerfile", "github-actions", "custom.regex"],
+  "schedule": ["before 8am on monday"],
+  "semanticCommits": true,
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "groupName": "Docker base images",
+      "semanticCommitType": "deps",
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "semanticCommitType": "ci",
+      "semanticCommitScope": "deps",
+      // Pins actions to immutable commit SHAs to prevent supply chain attacks.
+      // Renovate keeps the SHA up to date automatically on each version bump.
+      "pinDigests": true,
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "groupName": "Taskfile images",
+      "semanticCommitType": "deps",
+      "semanticCommitScope": "dev",
+    },
+  ],
+  "customManagers": [
+    {
+      // Tracks Docker Hub and external registry images (without port) in Taskfile.yml.
+      // To opt a variable in, append `# renovate: docker` to the line:
+      //
+      //   VAR_NAME: org/image:tag           # renovate: docker  (Docker Hub)
+      //   VAR_NAME: ghcr.io/owner/img:tag   # renovate: docker  (registry without port)
+      //
+      // The negative lookahead (?!\d+/) prevents this pattern from matching
+      // external registries with a port (host:port/...) — those are handled below.
+      "customType": "regex",
+      "managerFilePatterns": ["^Taskfile\\.yml$"],
+      "matchStrings": [
+        "(?<depName>[a-z0-9][a-z0-9._/-]*):(?!\\d+/)(?<currentValue>[^\\s#\\n]+)\\s+#\\s+renovate:\\s+docker",
+      ],
+      "datasourceTemplate": "docker",
+    },
+    {
+      // Tracks images from external registries with a port in Taskfile.yml.
+      // Same `# renovate: docker` comment, different format:
+      //
+      //   VAR_NAME: registry.example.com:5050/org/image:tag  # renovate: docker
+      //
+      // The `host:port` prefix is captured separately as registryUrl and cannot
+      // be merged with the pattern above — the port colon is ambiguous with
+      // the image:tag colon and requires an explicit \d+ match to disambiguate.
+      "customType": "regex",
+      "managerFilePatterns": ["^Taskfile\\.yml$"],
+      "matchStrings": [
+        "(?<registryUrl>[a-z0-9][a-z0-9.-]+:\\d+)/(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n]+)\\s+#\\s+renovate:\\s+docker",
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://{{registryUrl}}",
+    },
+  ],
+}

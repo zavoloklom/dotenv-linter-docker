@@ -9,9 +9,9 @@ vars:
     sh: git rev-parse --short HEAD
   DOTENV_LINTER_VERSION:
     sh: cat VERSION
-  HADOLINT_IMAGE: hadolint/hadolint:v2.14.0
+  HADOLINT_IMAGE: hadolint/hadolint:v2.14.0 # renovate: docker
   HADOLINT_FILES: 'Dockerfile'
-  MARKDOWNLINT_IMAGE: davidanson/markdownlint-cli2:v0.14.0
+  MARKDOWNLINT_IMAGE: davidanson/markdownlint-cli2:v0.14.0 # renovate: docker
   MARKDOWNLINT_FILES: '"**/*.md" "!CHANGELOG.md"'
 
 tasks:
