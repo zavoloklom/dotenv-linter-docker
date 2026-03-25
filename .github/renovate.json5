@@ -34,37 +34,43 @@
   ],
   "customManagers": [
     {
-      // Tracks Docker Hub and external registry images (without port) in Taskfile.yml.
-      // To opt a variable in, append `# renovate: docker` to the line:
+      // Docker Hub images: image:tag or org/image:tag
+      // The first path segment must not contain dots — this excludes registry hostnames
+      // (ghcr.io/...) and port-based registries (host:port/...), both handled below.
       //
-      //   VAR_NAME: org/image:tag           # renovate: docker  (Docker Hub)
-      //   VAR_NAME: ghcr.io/owner/img:tag   # renovate: docker  (registry without port)
-      //
-      // The negative lookahead (?!\d+/) prevents this pattern from matching
-      // external registries with a port (host:port/...) — those are handled below.
+      //   VAR_NAME: image:tag          # renovate: docker
+      //   VAR_NAME: org/image:tag      # renovate: docker
       "customType": "regex",
       "managerFilePatterns": ["^Taskfile\\.yml$"],
       "matchStrings": [
-        "(?<depName>[a-z0-9][a-z0-9._/-]*):(?!\\d+/)(?<currentValue>[^\\s#\\n]+)\\s+#\\s+renovate:\\s+docker",
+        "(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9-]*(?:/[a-z0-9][a-z0-9._-]*)*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker"
       ],
       "datasourceTemplate": "docker",
     },
     {
-      // Tracks images from external registries with a port in Taskfile.yml.
-      // Same `# renovate: docker` comment, different format:
+      // External registry images without a port: hostname.tld/path:tag
+      // Hostname must contain a dot and be followed directly by / (no port number).
       //
-      //   VAR_NAME: registry.example.com:5050/org/image:tag  # renovate: docker
-      //
-      // The `host:port` prefix is captured separately as registryUrl and cannot
-      // be merged with the pattern above — the port colon is ambiguous with
-      // the image:tag colon and requires an explicit \d+ match to disambiguate.
+      //   VAR_NAME: ghcr.io/owner/image:tag  # renovate: docker
       "customType": "regex",
       "managerFilePatterns": ["^Taskfile\\.yml$"],
       "matchStrings": [
-        "(?<registryUrl>[a-z0-9][a-z0-9.-]+:\\d+)/(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n]+)\\s+#\\s+renovate:\\s+docker",
+        "(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9.-]*\\.[a-z0-9.-]+/[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker"
       ],
       "datasourceTemplate": "docker",
-      "registryUrlTemplate": "https://{{registryUrl}}",
+    },
+    {
+      // External registry images with a port: hostname.tld:PORT/path:tag
+      // The host:port prefix is captured separately as registryUrl.
+      //
+      //   VAR_NAME: registry.example.com:5050/org/image:tag  # renovate: docker
+      "customType": "regex",
+      "managerFilePatterns": ["^Taskfile\\.yml$"],
+      "matchStrings": [
+        "(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<registryUrl>[a-z0-9][a-z0-9.-]+:\\d+)/(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker"
+      ],
+      "datasourceTemplate": "docker",
+      "registryUrlTemplate": "https://{{{registryUrl}}}",
     },
   ],
 }
