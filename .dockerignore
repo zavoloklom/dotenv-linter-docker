@@ -24,8 +24,8 @@
 # Github
 .github/
 
-# Linters and Makefile
-Makefile
+# Linters and Taskfile
+Taskfile.yml
 lefthook.yml
 .hadolint.yml
 .markdownlint.json
