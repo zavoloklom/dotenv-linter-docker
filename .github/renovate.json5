@@ -14,6 +14,8 @@
   semanticCommits: 'enabled',
   prConcurrentLimit: 5,
   prHourlyLimit: 2,
+  dependencyDashboard: false,
+  configMigration: true,
   packageRules: [
     {
       matchUpdateTypes: [
@@ -48,35 +50,27 @@
   ],
   customManagers: [
     {
+      // Tracks Docker images in Taskfile via `# renovate: docker` comments.
+      // Renovate's Docker datasource parses the registry from depName automatically.
+      //
+      //   VAR_NAME: image:tag                         # renovate: docker  (Docker Hub, no org)
+      //   VAR_NAME: org/image:tag                     # renovate: docker  (Docker Hub, with org)
+      //   VAR_NAME: ghcr.io/owner/image:tag           # renovate: docker  (registry without port)
+      //   VAR_NAME: registry.example.com:5050/image:tag  # renovate: docker  (registry with port)
+      //
+      // Pattern 1 — Docker Hub: first segment has no dots (no registry hostname).
+      // Pattern 2 — Registry without port: hostname has a dot, followed by / directly.
+      // Pattern 3 — Registry with port: hostname:port/ prefix before the image path.
       customType: 'regex',
       managerFilePatterns: [
-        '^Taskfile\\.yml$',
+        '/(^|/)[Tt]askfile\.ya?ml$/',
       ],
       matchStrings: [
         '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9-]*(?:/[a-z0-9][a-z0-9._-]*)*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker',
-      ],
-      datasourceTemplate: 'docker',
-    },
-    {
-      customType: 'regex',
-      managerFilePatterns: [
-        '^Taskfile\\.yml$',
-      ],
-      matchStrings: [
         '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9.-]*\\.[a-z0-9.-]+/[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker',
+        '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9.-]+:\\d+/[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker'
       ],
       datasourceTemplate: 'docker',
-    },
-    {
-      customType: 'regex',
-      managerFilePatterns: [
-        '^Taskfile\\.yml$',
-      ],
-      matchStrings: [
-        '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<registryUrl>[a-z0-9][a-z0-9.-]+:\\d+)/(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker',
-      ],
-      datasourceTemplate: 'docker',
-      registryUrlTemplate: 'https://{{{registryUrl}}}',
     },
   ],
 }
