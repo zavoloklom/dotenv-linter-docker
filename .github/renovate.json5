@@ -1,76 +1,82 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "enabledManagers": ["dockerfile", "github-actions", "custom.regex"],
-  "schedule": ["before 8am on monday"],
-  "semanticCommits": true,
-  "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
-  "packageRules": [
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
+  ],
+  enabledManagers: [
+    'dockerfile',
+    'github-actions',
+    'custom.regex',
+  ],
+  schedule: [
+    'before 8am on monday',
+  ],
+  semanticCommits: 'enabled',
+  prConcurrentLimit: 5,
+  prHourlyLimit: 2,
+  packageRules: [
     {
-      "matchUpdateTypes": ["patch"],
-      "automerge": true,
+      matchUpdateTypes: [
+        'patch',
+      ],
+      automerge: true,
     },
     {
-      "matchManagers": ["dockerfile"],
-      "groupName": "Docker base images",
-      "semanticCommitType": "deps",
+      matchManagers: [
+        'dockerfile',
+      ],
+      groupName: 'Docker base images',
+      semanticCommitType: 'deps',
     },
     {
-      "matchManagers": ["github-actions"],
-      "groupName": "GitHub Actions",
-      "semanticCommitType": "ci",
-      "semanticCommitScope": "deps",
-      // Pins actions to immutable commit SHAs to prevent supply chain attacks.
-      // Renovate keeps the SHA up to date automatically on each version bump.
-      "pinDigests": true,
+      matchManagers: [
+        'github-actions',
+      ],
+      groupName: 'GitHub Actions',
+      semanticCommitType: 'ci',
+      semanticCommitScope: 'deps',
+      pinDigests: true,
     },
     {
-      "matchManagers": ["custom.regex"],
-      "groupName": "Taskfile images",
-      "semanticCommitType": "deps",
-      "semanticCommitScope": "dev",
+      matchManagers: [
+        'custom.regex',
+      ],
+      groupName: 'Taskfile images',
+      semanticCommitType: 'deps',
+      semanticCommitScope: 'dev',
     },
   ],
-  "customManagers": [
+  customManagers: [
     {
-      // Docker Hub images: image:tag or org/image:tag
-      // The first path segment must not contain dots — this excludes registry hostnames
-      // (ghcr.io/...) and port-based registries (host:port/...), both handled below.
-      //
-      //   VAR_NAME: image:tag          # renovate: docker
-      //   VAR_NAME: org/image:tag      # renovate: docker
-      "customType": "regex",
-      "managerFilePatterns": ["^Taskfile\\.yml$"],
-      "matchStrings": [
-        "(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9-]*(?:/[a-z0-9][a-z0-9._-]*)*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker"
+      customType: 'regex',
+      managerFilePatterns: [
+        '^Taskfile\\.yml$',
       ],
-      "datasourceTemplate": "docker",
+      matchStrings: [
+        '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9-]*(?:/[a-z0-9][a-z0-9._-]*)*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker',
+      ],
+      datasourceTemplate: 'docker',
     },
     {
-      // External registry images without a port: hostname.tld/path:tag
-      // Hostname must contain a dot and be followed directly by / (no port number).
-      //
-      //   VAR_NAME: ghcr.io/owner/image:tag  # renovate: docker
-      "customType": "regex",
-      "managerFilePatterns": ["^Taskfile\\.yml$"],
-      "matchStrings": [
-        "(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9.-]*\\.[a-z0-9.-]+/[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker"
+      customType: 'regex',
+      managerFilePatterns: [
+        '^Taskfile\\.yml$',
       ],
-      "datasourceTemplate": "docker",
+      matchStrings: [
+        '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<depName>[a-z0-9][a-z0-9.-]*\\.[a-z0-9.-]+/[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker',
+      ],
+      datasourceTemplate: 'docker',
     },
     {
-      // External registry images with a port: hostname.tld:PORT/path:tag
-      // The host:port prefix is captured separately as registryUrl.
-      //
-      //   VAR_NAME: registry.example.com:5050/org/image:tag  # renovate: docker
-      "customType": "regex",
-      "managerFilePatterns": ["^Taskfile\\.yml$"],
-      "matchStrings": [
-        "(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<registryUrl>[a-z0-9][a-z0-9.-]+:\\d+)/(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker"
+      customType: 'regex',
+      managerFilePatterns: [
+        '^Taskfile\\.yml$',
       ],
-      "datasourceTemplate": "docker",
-      "registryUrlTemplate": "https://{{{registryUrl}}}",
+      matchStrings: [
+        '(?:^|\\r\\n|\\r|\\n)\\s*[A-Z0-9_]+:\\s+(?<registryUrl>[a-z0-9][a-z0-9.-]+:\\d+)/(?<depName>[a-z0-9][a-z0-9._/-]*):(?<currentValue>[^\\s#\\n/]+)\\s+#\\s+renovate:\\s+docker',
+      ],
+      datasourceTemplate: 'docker',
+      registryUrlTemplate: 'https://{{{registryUrl}}}',
     },
   ],
 }
