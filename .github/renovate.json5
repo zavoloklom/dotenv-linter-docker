@@ -29,6 +29,7 @@
       ],
       groupName: 'Docker base images',
       semanticCommitType: 'deps',
+      semanticCommitScope: 'docker'
     },
     {
       matchManagers: [
