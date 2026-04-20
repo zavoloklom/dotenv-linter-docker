@@ -7,7 +7,7 @@
 This repository provides Docker images for the [dotenv-linter](https://github.com/dotenv-linter/dotenv-linter) tool,
 packaged in two versions **Alpine** and **BusyBox**:
 
-- **Alpine version**: Includes additional utilities `git` and `curl` providing more flexibility.
+- **Alpine version**: Includes additional utilities `git`, `curl`, `grep`, and `gettext` providing more flexibility.
 - **BusyBox version**: A minimalistic image containing only `dotenv-linter` and the `BusyBox` toolkit.
 
 > Please note that if you only need `dotenv-linter`, it's recommended to use the official Docker

@@ -7,6 +7,7 @@ RUN apk update && apk upgrade && \
     git \
     curl \
     grep \
+    gettext \
     && rm -rf /tmp/* /var/cache/apk/*
 
 # Install dotenv-linter
