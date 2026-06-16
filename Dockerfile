@@ -1,4 +1,4 @@
-FROM alpine:3.23.4 AS alpine-version
+FROM alpine:3.24.1 AS alpine-version
 
 ARG DOTENV_LINTER_VERSION="0.0.0"
 
@@ -34,7 +34,7 @@ LABEL \
   org.opencontainers.image.vendor="Sergey Kupletsky" \
   org.opencontainers.image.licenses="MIT"
 
-FROM busybox:1.37.0-musl AS busybox-version
+FROM busybox:1.38.0-musl AS busybox-version
 
 COPY --from=alpine-version /usr/local/bin/dotenv-linter /usr/local/bin/dotenv-linter
 
