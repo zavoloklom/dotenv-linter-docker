@@ -11,7 +11,7 @@ vars:
     sh: cat VERSION
   HADOLINT_IMAGE: hadolint/hadolint:v2.15.1 # renovate: docker
   HADOLINT_FILES: 'Dockerfile'
-  MARKDOWNLINT_IMAGE: davidanson/markdownlint-cli2:v0.23.2 # renovate: docker
+  MARKDOWNLINT_IMAGE: davidanson/markdownlint-cli2:v0.24.0 # renovate: docker
   MARKDOWNLINT_FILES: '"**/*.md" "!CHANGELOG.md"'
 
 tasks:
